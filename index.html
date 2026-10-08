@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ronak Muscle Coach</title>
+<meta name="theme-color" content="#080b10">
+<style>
+:root{--bg:#080b10;--card:#111722;--card2:#151c28;--text:#f5f7fb;--muted:#98a2b3;--line:#253043;--accent:#8b5cf6;--green:#22c55e;--red:#ef4444}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#070a0f,#0d1118);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:1150px;margin:auto;padding:24px}.hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:20px}.eyebrow{color:#a78bfa;font-size:12px;font-weight:800;letter-spacing:.14em}.hero h1{font-size:clamp(28px,6vw,48px);margin:5px 0}.hero p{color:var(--muted);margin:0;max-width:720px}.week{background:var(--card);border:1px solid var(--line);padding:14px 18px;border-radius:16px;min-width:140px;text-align:center}.week b{display:block;font-size:26px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:rgba(17,23,34,.94);border:1px solid var(--line);border-radius:18px;padding:18px}.metric b{font-size:25px;display:block}.metric span,.small{color:var(--muted);font-size:13px}.tabs{display:flex;gap:8px;overflow:auto;margin:18px 0}.tab{border:1px solid var(--line);background:var(--card);color:var(--muted);padding:10px 14px;border-radius:12px;white-space:nowrap;cursor:pointer}.tab.active{background:#241b3e;color:#fff;border-color:#6d4bb8}.section{display:none}.section.active{display:block}.two{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.field label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}.field input,.field select{width:100%;background:#0b1018;color:#fff;border:1px solid var(--line);padding:11px;border-radius:10px}.btn{border:0;background:var(--accent);color:#fff;padding:11px 14px;border-radius:10px;font-weight:800;cursor:pointer}.btn.secondary{background:#202938}.btn.green{background:#16a34a}.btn.danger{background:#7f1d1d}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.exercise{display:grid;grid-template-columns:1fr 90px 90px;gap:8px;padding:11px 0;border-bottom:1px solid #202938}.exercise:last-child{border-bottom:0}.pill{font-size:12px;color:#c4b5fd}.foodrow{display:grid;grid-template-columns:1.5fr 90px 90px 70px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #202938}.foodrow input{width:100%;background:#0b1018;border:1px solid var(--line);color:#fff;padding:8px;border-radius:8px}.bar{height:10px;background:#202938;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#8b5cf6,#22c55e);width:0}.notice{background:#171325;border:1px solid #4c3579;padding:14px;border-radius:14px;color:#d8ccff}.muted{color:var(--muted)}.coach{min-height:120px;white-space:pre-wrap;line-height:1.55}.status{font-size:12px;padding:5px 9px;border-radius:999px;background:#172033;color:#aab6c8}.status.ok{color:#86efac;background:#102719}.status.warn{color:#fcd34d;background:#2a2110}.footer{color:#667085;text-align:center;padding:28px 0;font-size:12px}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.hero{align-items:stretch;flex-direction:column}.week{width:100%}}@media(max-width:500px){.wrap{padding:14px}.grid,.formgrid{grid-template-columns:1fr}.foodrow{grid-template-columns:1fr 80px 80px 60px}.exercise{grid-template-columns:1fr 75px 75px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+<div><div class="eyebrow">PERSONAL PERFORMANCE SYSTEM</div><h1>RONAK MUSCLE COACH</h1><p>Track calories, bodyweight and training. The Coach uses your actual history and proposes changes instead of blindly changing your plan.</p></div>
+<div class="week"><span class="small">CURRENT WEEK</span><b id="weekNo">1</b><span class="small">of 16</span><div id="authStatus" class="status">Local mode</div></div>
+</header>
+
+<div class="grid">
+<div class="card metric"><span>Daily calories</span><b id="calTarget">—</b><span>target</span></div>
+<div class="card metric"><span>Protein</span><b id="proteinTarget">—</b><span>g/day</span></div>
+<div class="card metric"><span>7-day avg weight</span><b id="avgWeight">—</b><span>kg</span></div>
+<div class="card metric"><span>Workout status</span><b id="workoutStatus">0/6</b><span>days completed</span></div>
+</div>
+
+<div class="tabs">
+<button class="tab active" onclick="tab('dashboard',this)">Dashboard</button>
+<button class="tab" onclick="tab('workouts',this)">Workouts</button>
+<button class="tab" onclick="tab('food',this)">Calories</button>
+<button class="tab" onclick="tab('coach',this)">AI Coach</button>
+<button class="tab" onclick="tab('progress',this)">Progress</button>
+<button class="tab" onclick="tab('setup',this)">Setup</button>
+</div>
+
+<section id="dashboard" class="section active"><div class="two">
+<div class="card"><h2>Weekly control</h2><p class="muted">Use your 7-day average, not a single weigh-in.</p>
+<div class="notice"><b>Adjustment rule</b><br>For muscle gain, aim for ~0.2–0.4 kg/week. If the trend is flat for ~2 weeks, propose +150–200 kcal/day. If it rises too quickly for multiple weeks, propose −150–200 kcal/day. No blind changes.</div>
+<div class="actions"><button class="btn green" onclick="nextWeek()">Start next week</button><button class="btn secondary" onclick="tab('setup')">Edit targets</button></div></div>
+<div class="card"><h2>Today</h2><div id="todaySummary"></div></div>
+</div></section>
+
+<section id="workouts" class="section"><div class="card"><h2 id="workoutTitle">Push A</h2><p class="muted" id="workoutFocus"></p><div id="exerciseList"></div>
+<div class="actions"><button class="btn green" onclick="completeWorkout()">Mark workout complete</button><button class="btn secondary" onclick="changeDay(-1)">Previous</button><button class="btn secondary" onclick="changeDay(1)">Next</button></div></div></section>
+
+<section id="food" class="section"><div class="card"><h2>Daily calorie tracker</h2><div class="grid"><div class="metric"><span>Calories logged</span><b id="foodCals">0</b></div><div class="metric"><span>Protein logged</span><b id="foodProtein">0g</b></div><div class="metric"><span>Remaining</span><b id="foodRemain">—</b></div><div class="metric"><span>Target</span><b id="foodTarget">—</b></div></div><br><div class="bar"><i id="calBar"></i></div><div class="actions"><button class="btn" onclick="addFood()">Add food</button><button class="btn danger" onclick="resetFood()">Reset today</button></div><div id="foodList"></div></div></section>
+
+<section id="coach" class="section"><div class="two">
+<div class="card"><h2>AI Coach</h2><p class="muted">Ask about today's calories, protein, weight trend, training or what to do next. Your Supabase session is used to call the protected Edge Function.</p>
+<div class="field"><label>Question</label><input id="coachQuestion" placeholder="What should I focus on today?"></div>
+<div class="actions"><button class="btn" onclick="askCoach()">Ask Coach</button><button class="btn secondary" onclick="syncCloud()">Sync cloud</button></div>
+<div id="coachStatus" class="status" style="margin-top:12px">Ready</div></div>
+<div class="card"><h2>Coach response</h2><div id="coachAnswer" class="coach muted">No coach run yet.</div><div id="coachAction"></div></div>
+</div></section>
+
+<section id="progress" class="section"><div class="two">
+<div class="card"><h2>Log bodyweight</h2><p class="muted">Log under similar conditions when possible.</p><div class="formgrid"><div class="field"><label>Weight (kg)</label><input id="weightInput" type="number" step=".1"></div><div class="field"><label>Date</label><input id="weightDate" type="date"></div></div><div class="actions"><button class="btn" onclick="saveWeight()">Save weight</button></div><div id="weightList"></div></div>
+<div class="card"><h2>16-week progression</h2><div id="weekPlan"></div></div>
+</div></section>
+
+<section id="setup" class="section"><div class="two">
+<div class="card"><h2>Your targets</h2><p class="muted">Starting point for your current goal: ~3,000 kcal and ~180 g protein/day. You can calculate a personalized estimate below.</p>
+<div class="formgrid"><div class="field"><label>Age</label><input id="age" type="number"></div><div class="field"><label>Sex</label><select id="sex"><option value="male">Male</option><option value="female">Female</option></select></div><div class="field"><label>Height (cm)</label><input id="height" type="number"></div><div class="field"><label>Weight (kg)</label><input id="weight" type="number" step=".1" value="90.5"></div><div class="field"><label>Activity</label><select id="activity"><option value="1.2">Sedentary</option><option value="1.375">Light</option><option value="1.55" selected>Moderate</option><option value="1.725">Very active</option><option value="1.9">Athlete-level</option></select></div><div class="field"><label>Goal</label><select id="goal"><option value="gain" selected>Muscle gain</option><option value="maintain">Maintain</option><option value="cut">Fat loss</option></select></div></div>
+<div class="actions"><button class="btn" onclick="calculateTargets()">Calculate & save</button><button class="btn secondary" onclick="setStartingTargets()">Use 3000 / 180</button></div><div id="calcResult" class="notice" style="margin-top:12px;display:none"></div></div>
+<div class="card"><h2>Cloud account</h2><p class="muted">Optional sign-in enables cross-device sync. The OpenAI secret never belongs in this frontend.</p><div class="formgrid"><div class="field"><label>Email</label><input id="email" type="email" placeholder="you@example.com"></div><div class="field"><label>Password</label><input id="password" type="password" placeholder="Password"></div></div><div class="actions"><button class="btn" onclick="signIn()">Sign in</button><button class="btn secondary" onclick="signUp()">Create account</button><button class="btn danger" onclick="signOut()">Sign out</button></div><div id="cloudMsg" class="small" style="margin-top:10px"></div></div>
+</div></section>
+
+<div class="footer">Ronak Muscle Coach • Local-first + Supabase cloud sync + protected AI Coach</div>
+</div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const SUPABASE_URL = "https://uomfngyswypokhrjsrop.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_HfVIRASyba7gVzsxku3aSQ_BmhOGi08";
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+const workouts=[
+["Push A","Upper chest + delts + triceps",[["Incline Dumbbell Press","4×6–10"],["Flat Bench Press","3×6–10"],["Cable Chest Fly","3×10–15"],["Machine Shoulder Press","3×8–12"],["Cable Lateral Raise","4×12–20"],["Rope Triceps Pushdown","3×8–12"],["Overhead Triceps Extension","3×10–15"]]],
+["Pull A","Lat width + back thickness + biceps",[["Pull-Up / Assisted Pull-Up","4×6–10"],["Lat Pulldown","3×8–12"],["Chest-Supported Row","4×6–10"],["One-Arm Cable Pulldown","3×8–12"],["Seated Cable Row","3×8–12"],["Straight-Arm Pulldown","2×12–15"],["Rear-Delt Fly","3×12–20"],["EZ-Bar Curl","3×8–12"],["Hammer Curl","3×10–15"]]],
+["Legs A","Quads + hamstrings + calves",[["Squat / Hack Squat","4×6–10"],["Romanian Deadlift","3×6–10"],["Leg Press","3×8–12"],["Leg Curl","3×10–15"],["Leg Extension","3×10–15"],["Calf Raise","4×10–15"],["Hanging Leg Raise","3×10–15"]]],
+["Push B","Upper chest + shoulder emphasis",[["Incline Smith Press","4×8–12"],["Machine Chest Press","3×8–12"],["Seated DB Shoulder Press","3×8–12"],["Cable Lateral Raise","4×12–20"],["DB Lateral Raise","3×15–20"],["Pec Deck","2×12–15"],["Rope Triceps Pushdown","3×10–15"],["Overhead Cable Extension","3×10–15"]]],
+["Pull B","Width + thickness + arms",[["Lat Pulldown","4×8–12"],["Barbell / Machine Row","3×6–10"],["Seated Cable Row","3×8–12"],["One-Arm DB Row","3×8–12"],["Straight-Arm Pulldown","2×12–15"],["Reverse Pec Deck","3×12–20"],["EZ-Bar Curl","3×8–12"],["Incline DB Curl","3×10–15"],["Hammer Curl","2×10–15"]]],
+["Legs B + Abs","Quads + hamstrings + abs",[["Hack Squat","4×8–12"],["Bulgarian Split Squat","3×8–12/leg"],["Romanian Deadlift","3×8–12"],["Leg Curl","3×10–15"],["Leg Extension","3×12–15"],["Calf Raise","4×12–20"],["Cable Crunch","3×10–15"],["Hanging Leg Raise","3×10–15"]]]
+];
+const foods=[["Whey protein",120,24],["Oats",389,17],["Milk",61,3.2],["Banana",89,1.1],["Soy chunks",345,52],["Cooked rice",130,2.7],["Dal",116,9],["Curd / Greek yogurt",73,10],["Tofu",144,17],["Roti",297,9],["Vegetables",60,3],["Peanut butter",588,25]];
+
+let s=JSON.parse(localStorage.getItem("rmc")||"{}");
+s.week=s.week||1;s.day=s.day||0;s.calories=s.calories||0;s.protein=s.protein||0;s.food=s.food||[];s.weights=s.weights||[];s.done=s.done||[];s.target=s.target||{calories:3000,protein:180};
+
+function saveLocal(){localStorage.setItem("rmc",JSON.stringify(s));render()}
+function tab(id,btn){document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));if(btn)btn.classList.add("active")}
+window.tab=tab;
+const fmt=n=>n==null||isNaN(n)?"—":Math.round(n).toLocaleString();
+
+function snapshot(){
+ return {week:s.week,day:s.day,calories:s.calories,protein:s.protein,target:s.target,weights:s.weights.slice(-28),food:s.food.slice(-100),done:s.done.slice(-30)};
+}
+async function syncCloud(){
+ const {data:{user}}=await supabase.auth.getUser();
+ if(!user){document.getElementById("coachStatus").textContent="Sign in first for cloud sync";return}
+ const {error}=await supabase.from("rmc_cloud_state").upsert({user_id:user.id,state:s,updated_at:new Date().toISOString()});
+ if(error) throw error;
+ document.getElementById("coachStatus").textContent="Cloud synced";
+}
+async function loadCloud(){
+ const {data:{user}}=await supabase.auth.getUser();
+ if(!user)return;
+ const {data,error}=await supabase.from("rmc_cloud_state").select("state").eq("user_id",user.id).maybeSingle();
+ if(!error && data?.state){s={...s,...data.state};saveLocal()}
+ document.getElementById("authStatus").textContent=user.email||"Cloud";
+ document.getElementById("authStatus").className="status ok";
+}
+async function signIn(){
+ const email=document.getElementById("email").value,password=document.getElementById("password").value;
+ const {error}=await supabase.auth.signInWithPassword({email,password});
+ document.getElementById("cloudMsg").textContent=error?error.message:"Signed in.";
+ if(!error)await loadCloud();
+}
+async function signUp(){
+ const email=document.getElementById("email").value,password=document.getElementById("password").value;
+ const {error}=await supabase.auth.signUp({email,password});
+ document.getElementById("cloudMsg").textContent=error?error.message:"Account created. Check email if confirmation is enabled.";
+}
+async function signOut(){await supabase.auth.signOut();document.getElementById("authStatus").textContent="Local mode";document.getElementById("authStatus").className="status";}
+
+async function askCoach(){
+ const q=document.getElementById("coachQuestion").value.trim()||"What should I focus on today?";
+ const status=document.getElementById("coachStatus"),answer=document.getElementById("coachAnswer"),action=document.getElementById("coachAction");
+ status.textContent="Thinking…";answer.textContent="";action.innerHTML="";
+ const {data:{session}}=await supabase.auth.getSession();
+ if(!session){status.textContent="Sign in required";answer.textContent="Sign in under Setup so the protected Coach function can read your personal history.";return}
+ try{
+   const {data,error}=await supabase.functions.invoke("rmc-coach",{body:{question:q,snapshot:snapshot()}});
+   if(error)throw error;
+   answer.textContent=data.answer||"No answer returned.";
+   if(data.action){
+     action.innerHTML=`<div class="notice" style="margin-top:14px"><b>Proposed action: ${data.action.title||"Change"}</b><br>${data.action.rationale||""}<br><span class="small">This is proposed, not automatically applied.</span></div>`;
+   }
+   status.textContent=`${data.provider||"coach"} • ${data.model||""}`;
+ }catch(e){status.textContent="Coach error";answer.textContent=String(e?.message||e)}
+}
+
+function render(){
+ weekNo.textContent=s.week;calTarget.textContent=s.target?fmt(s.target.calories):"Set";proteinTarget.textContent=s.target?fmt(s.target.protein)+"g":"Set";
+ const last=s.weights.slice(-7);avgWeight.textContent=last.length?(last.reduce((a,b)=>a+b.w,0)/last.length).toFixed(1):"—";
+ workoutStatus.textContent=s.done.filter(x=>x.week===s.week).length+"/6";
+ workoutTitle.textContent=workouts[s.day][0];workoutFocus.textContent=workouts[s.day][1];
+ exerciseList.innerHTML=workouts[s.day][2].map(e=>`<div class="exercise"><b>${e[0]}</b><span class="pill">${e[1]}</span><span class="small">Week ${s.week}</span></div>`).join("");
+ foodCals.textContent=fmt(s.calories);foodProtein.textContent=fmt(s.protein)+"g";foodTarget.textContent=s.target?fmt(s.target.calories):"—";foodRemain.textContent=s.target?fmt(Math.max(0,s.target.calories-s.calories)):"—";
+ calBar.style.width=s.target?Math.min(100,s.calories/s.target.calories*100)+"%":"0%";
+ foodList.innerHTML=s.food.map((f,i)=>`<div class="foodrow"><b>${f.name}</b><input value="${f.grams}" type="number" onchange="editFood(${i},this.value)"> <span>${fmt(f.cals)} kcal</span><button class="btn danger" onclick="delFood(${i})">×</button></div>`).join("");
+ todaySummary.innerHTML=`<p>Calories: <b>${fmt(s.calories)}</b> / ${s.target?fmt(s.target.calories):"—"}</p><p>Protein: <b>${fmt(s.protein)}g</b> / ${s.target?fmt(s.target.protein)+"g":"—"}</p><p>Workout: <b>${s.done.some(x=>x.week===s.week&&x.day===s.day)?"Complete":"Not complete"}</b></p>`;
+ weightList.innerHTML=s.weights.slice().reverse().slice(0,10).map(x=>`<p>${x.date} — <b>${x.w.toFixed(1)} kg</b></p>`).join("")||'<p class="muted">No weights logged yet.</p>';
+ weekPlan.innerHTML=Array.from({length:16},(_,i)=>`<div style="padding:8px 0;border-bottom:1px solid #202938"><b>Week ${i+1}</b> — ${i<4?"Foundation":i<8?"Progressive overload":i<12?"Volume + load":i<15?"Peak consistency":"Deload / reassess"}</div>`).join("");
+}
+function changeDay(n){s.day=(s.day+n+6)%6;saveLocal()}
+function completeWorkout(){if(!s.done.some(x=>x.week===s.week&&x.day===s.day))s.done.push({week:s.week,day:s.day,date:new Date().toISOString().slice(0,10)});saveLocal();syncCloud().catch(()=>{})}
+function nextWeek(){s.week=Math.min(16,s.week+1);s.day=0;s.calories=0;s.protein=0;s.food=[];saveLocal();syncCloud().catch(()=>{});tab("dashboard",document.querySelector(".tab"))}
+function addFood(){const name=prompt("Food name:");if(!name)return;const grams=Number(prompt("Amount in grams:","100"));if(!grams)return;let match=foods.find(x=>name.toLowerCase().includes(x[0].toLowerCase())||x[0].toLowerCase().includes(name.toLowerCase()));let kcal=match?match[1]*grams/100:Number(prompt("Calories per 100g:","100"));let pro=match?match[2]*grams/100:Number(prompt("Protein per 100g:","5"));s.food.push({name,grams,cals:kcal,pro});s.calories+=kcal;s.protein+=pro;saveLocal();syncCloud().catch(()=>{})}
+function editFood(i,v){const old=s.food[i],ratio=Number(v)/old.grams;s.calories+=old.cals*(ratio-1);s.protein+=old.pro*(ratio-1);old.grams=Number(v);old.cals*=ratio;old.pro*=ratio;saveLocal();syncCloud().catch(()=>{})}
+function delFood(i){s.calories-=s.food[i].cals;s.protein-=s.food[i].pro;s.food.splice(i,1);saveLocal();syncCloud().catch(()=>{})}
+function resetFood(){if(confirm("Reset today's food log?")){s.calories=0;s.protein=0;s.food=[];saveLocal();syncCloud().catch(()=>{})}}
+function saveWeight(){const w=Number(weightInput.value),d=weightDate.value||new Date().toISOString().slice(0,10);if(!w)return;s.weights.push({w,date:d});saveLocal();syncCloud().catch(()=>{})}
+function setStartingTargets(){s.target={calories:3000,protein:180};saveLocal();document.getElementById("calcResult").style.display="block";document.getElementById("calcResult").innerHTML="<b>Starting target set:</b> 3,000 kcal/day and 180 g protein/day."}
+function calculateTargets(){
+ const age=Number(ageInput?.value||document.getElementById("age").value),h=Number(document.getElementById("height").value),w=Number(document.getElementById("weight").value),sex=document.getElementById("sex").value,act=Number(document.getElementById("activity").value),goal=document.getElementById("goal").value;
+ if(!age||!h||!w)return alert("Enter age, height and weight first.");
+ let bmr=10*w+6.25*h-5*age+(sex==="male"?5:-161),tdee=bmr*act,calories=goal==="gain"?tdee+250:goal==="cut"?tdee-350:tdee,protein=Math.round(w*1.8);
+ s.target={calories:Math.round(calories),protein};s.weights.push({w,date:new Date().toISOString().slice(0,10)});
+ calcResult.style.display="block";calcResult.innerHTML=`Estimated maintenance: <b>${fmt(tdee)} kcal/day</b><br>Starting target: <b>${fmt(calories)} kcal/day</b><br>Protein target: <b>${protein}g/day</b>`;
+ saveLocal();syncCloud().catch(()=>{})
+}
+window.addFood=addFood;window.editFood=editFood;window.delFood=delFood;window.resetFood=resetFood;window.saveWeight=saveWeight;window.calculateTargets=calculateTargets;window.setStartingTargets=setStartingTargets;window.changeDay=changeDay;window.completeWorkout=completeWorkout;window.nextWeek=nextWeek;window.askCoach=askCoach;window.syncCloud=syncCloud;window.signIn=signIn;window.signUp=signUp;window.signOut=signOut;
+weightDate.value=new Date().toISOString().slice(0,10);
+render();loadCloud().catch(()=>{});
+</script>
+</body>
+</html>
